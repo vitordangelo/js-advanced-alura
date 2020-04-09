@@ -1,5 +1,9 @@
 class NegociacoesView extends View {
-  _template(model) {
+  constructor(elemento) {
+    super(elemento);
+  }
+
+  template(model) {
     return `
   <table class="table table-hover table-bordered">
     <thead>
@@ -14,6 +18,7 @@ class NegociacoesView extends View {
     <tbody>
       ${model.negociacoes
         .map((n) => {
+          // console.log(n)
           return `
         <tr> 
           <td>${DateHelper.dataParaTexto(n.data)}</td>
