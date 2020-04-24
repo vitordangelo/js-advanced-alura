@@ -18,14 +18,34 @@ class NegociacaoController {
       new MensagemView($("#mensagemView")),
       "texto"
     );
+
+    ConnectionFactory.getConnection()
+      .then((connection) => new NegociacaoDao(connection))
+      .then((dao) => dao.listaTodos())
+      .then((negociacoes) =>
+        negociacoes
+          .forEach((negociacao) => this.ListaNegociacoes.adiciona(negociacao))
+          .catch((error) => {
+            console.log(error);
+            this._mensagem = error;
+          })
+      );
   }
 
   adiciona(event) {
     event.preventDefault();
 
-    this._listaNegociacoes.adiciona(this._criaNegociacao());
-    this._mensagem.texto = "Negociação adicionada com sucesso";
-    this._limpaFormulario();
+    ConnectionFactory.getConnection()
+      .then((connection) => {
+        let negociacao = this._criaNegociacao();
+
+        new NegociacaoDao(connection).adiciona(negociacao).then(() => {
+          this._listaNegociacoes.adiciona(negociacao);
+          this._mensagem.texto = "Negociação adicionada com sucesso";
+          this._limpaFormulario();
+        });
+      })
+      .catch((erro) => (this._mensagem.texto = erro));
   }
 
   importaNegociacoes() {
@@ -67,7 +87,13 @@ class NegociacaoController {
   }
 
   apaga() {
-    this._listaNegociacoes.esvazia();
-    this._mensagem.texto = "Negociações apagadas com sucesso";
+    ConnectionFactory.getConnection()
+      .then((connection) => new NegociacaoDao(connection))
+      .then((dao) => dao.apagaTodos())
+      .then((mensagem) => {
+        console.log(mensagem);
+        this._mensagem.texto = mensagem;
+        this._listaNegociacoes.esvazia();
+      });
   }
 }
