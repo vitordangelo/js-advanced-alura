@@ -30,17 +30,18 @@ class NegociacaoDao {
 
       let negociacoes = [];
 
-      cursor.onsucces = (e) => {
+      cursor.onsuccess = (e) => {
         let atual = e.target.result;
 
         if (atual) {
           let dado = atual.value;
+
           negociacoes.push(
-            new NegociacaoDao(dado._data, dado._quantidade, dado._valor)
+            new Negociacao(dado._data, dado._quantidade, dado._valor)
           );
+
           atual.continue();
         } else {
-          console.log(negociacoes);
           resolve(negociacoes);
         }
       };
@@ -59,14 +60,11 @@ class NegociacaoDao {
         .objectStore(this._store)
         .clear();
 
-      request.onsucces = (e) => {
-        console.log(e.target.result);
-        resolve("Negociações apagadas com sucesso");
-      };
+      request.onsuccess = (e) => resolve("Negociações apagadas com sucesso");
 
       request.onerror = (e) => {
         console.log(e.target.error);
-        reject("Não foi possível remover as negociações");
+        reject("Não foi possível apagar as negociações");
       };
     });
   }
